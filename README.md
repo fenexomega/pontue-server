@@ -1,2 +1,2 @@
-# pontue-server
-Servidor da aplicação PONTUE: sistema de ponto eletrônico do PET TI
+# MoraComigoServidorTeste
+Servidor REST para dev
