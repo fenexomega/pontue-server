@@ -1,3 +1,4 @@
+// http://www.restapitutorial.com/lessons/httpmethods.html
 // carregar o .env do projeto
 require('dotenv').config()
 
@@ -45,6 +46,18 @@ app.use(function(req,res,next){
   res.header('Access-Control-Allow-Headers','Content-Type');
   next();
 })
+
+function log(message){
+  console.log("[INFO] " + message);
+}
+
+function debug(message){
+  console.log("[DEBUG] " + message);
+}
+
+function error(message){
+  console.error("[ERROR] " + message);
+}
 
 /********** SETUP INICIAL ***************
 *        CRIAR CONTA DE ADMIN
@@ -96,6 +109,7 @@ var json = req.body;
       var text_password = json.senha;
       if(err)
       {
+        console.log(err);
         throw err;
       }
 
@@ -128,20 +142,24 @@ var json = req.body;
 
 // Função de cadastro
 router.post('/registrar',function (req,res) {
+  var status = 200;
+
   var usuario = req.body;
   console.log(usuario);
   // Segurança: não deixar o cliente atribuir que é admin...
   usuario.admin = false;
+
   Usuario.add(usuario,function(err,use){
     var response;
     if(err)
     {
       response = {code:500,message: 'Email já cadastrado'}
+      status = 500;
       console.log(err);
     }
     else
       response = {code:200,message:'OK'};
-    res.json(response);
+    res.json(response).status(status);
   });
 });
 
@@ -152,13 +170,19 @@ router.post('/registrar',function (req,res) {
 //******* SER FEITO
 router.use(function(req,res,next){
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  debug("token = " + token);
   if(token)
   {
-    jwt.verify(token,app.get('secret'),function(err, decoded){
+    jwt.verify(token,app.get('secret'),
+    function(err, decoded){
       if(err)
+      {
         console.log(err);
+        res.json({error:"Token não autorizado"}).status(403);
+      }
       else
       {
+        log("Usuário foi decodificado")
         req.decoded = decoded;
         next();
       }
@@ -171,11 +195,26 @@ router.use(function(req,res,next){
   }
 });
 
-//rota: /api/pokemons body={name:nome,type:tipo}
-router.post('/ponto',function (req,res) {
+// Submeter ponto
+router.post('/pontos',function (req,res) {
   var ponto = req.body;
-  var usuario = req.decoded;
-  ponto.feitoPor = usuario;
+  var usuario = req.decoded._doc;
+  ponto.feitoPor = usuario._id;
+
+  ponto.dataCriacao = Date();
+  var momentInstance = moment(ponto.data);
+
+  // Por segurança, o usuario não deve colocar a data do ponto...
+  // isso pode acarretar em um usuário colocando ponto em um dia que...
+  // ele não foi. Isso só vale para o admin.
+  if(!ponto.hasOwnProperty('numeroDia') || usuario.admin == false)
+    ponto.numeroDia = Number(momentInstance.format('d'));
+  if(!ponto.hasOwnProperty('numeroMes') || usuario.admin == false)
+    ponto.numeroMes = Number(momentInstance.format('m'));
+  if(!ponto.hasOwnProperty('numeroSemana') || usuario.admin == false)
+    ponto.numeroSemana = Number(momentInstance.format('w'));
+  if(!ponto.hasOwnProperty('ano') || usuario_admin == false)
+    ponto.ano = Number(momentInstance.format('YYYY'));
 
   // Segurança, não deixar o usuário atribuir as horas
   ponto.horasDia = 0;
@@ -193,8 +232,51 @@ router.post('/ponto',function (req,res) {
 
   Ponto.add(ponto,function(err,ponto){
     if(err) throw err;
+    ponto.populate('feitoPor');
     res.json(ponto);
-  })
+  });
+});
+
+router.put('/pontos',function(req, res){
+  var usuario = req.decoded._doc;
+  var newPonto = req.body;
+  Ponto.find(newPonto._id, function(err, oldPonto){
+    // callback que procura o ponto antigo
+    if(err){
+      // caso não exista
+      error(err);
+      res.json({message:"Esse valor não existe ou sistema inoperante"})
+        .status(404);
+    }
+    // caso o valor exista
+    else
+    {
+      newPonto.dataUltAtualizacao = Date();
+      Ponto.update(newPonto,function(err,data){
+        if(err)
+        {
+          error(err);
+          res.json({ message: "Algo deu errado"}).status(204);
+        }
+        res.json(data);
+      });
+    }
+  });
+});
+
+router.put('/usuarios',function(req, res){
+  var usuario = req.decoded._doc;
+  var updateUsuario = req.body;
+  Usuario.update(updateUsuario,function(err,usuario){
+    if(err){
+      throw err;
+      res.json({ erro: 'Não foi possível fazer o update'}).status(404);
+    }
+    else{
+      res.json(usuario);
+    }
+  });
+
 });
 
 router.get('/usuario', function(req, res){
@@ -204,6 +286,7 @@ router.get('/usuario', function(req, res){
 
   res.json(usuario);
 });
+
 
 
 // //delete pokemon

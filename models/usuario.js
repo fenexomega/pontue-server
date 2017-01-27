@@ -42,6 +42,14 @@ module.exports.getByEmail = function(email, callback){
   Usuario.findOne(query, callback);
 };
 
+// https://stackoverflow.com/questions/13352735/mongoose-document-update-error?noredirect=1&lq=1
+module.exports.update = function(usuario,callback)
+{
+  var id = usuario._id;
+  delete usuario._id;
+  Usuario.update(id,usuario,callback);
+}
+
 //add usuarioSchema
 module.exports.add = function (usuario, callback) {
 	var hash	=	cryptoUtil.toSha256(usuario.senha);
