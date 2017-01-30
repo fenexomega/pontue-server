@@ -249,6 +249,7 @@ router.post('/pontos',function (req,res) {
 router.put('/pontos',function(req, res){
   var usuario = req.decoded._doc;
   var newPonto = req.body;
+  // FIXME falha de lógica. não checa se o usuário é o dono do ponto
   Ponto.update(newPonto._id,newPonto,function(err,ponto){
     if(err)
     {
@@ -285,6 +286,7 @@ router.get('/usuario', function(req, res){
   res.json(usuario);
 });
 
+// TODO: GET pontos, para pegar os pontos da semana e do ano
 
 
 // //delete pokemon
