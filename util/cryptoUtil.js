@@ -3,7 +3,7 @@ var config  = require('../config');
 
 
   function toSha256 (message){
-    var hash = crypto.createHmac('sha256',config.secret)
+    var hash = crypto.createHash('sha256')
             .update(message).digest('hex');
     return hash;
   }

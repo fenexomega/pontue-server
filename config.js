@@ -1,4 +1,4 @@
 module.exports = {
   'secret':'belosegredoesseaqui',
-  'database':'mongodb://localhost/pontue-database'
+  'database':'mongodb://127.0.0.1:27017/pontue-database'
 };

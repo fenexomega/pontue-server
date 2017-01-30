@@ -57,11 +57,30 @@ module.exports.add = function(ponto,callback)
 	Ponto.create(ponto,callback);
 }
 
-module.exports.update = function(ponto,callback)
+module.exports.update = function(id,ponto,callback)
 {
-	var id = ponto._id;
-	delete ponto._id;
-	Ponto.update(id,ponto,callback);
+	Ponto.findById(id, function(err, data){
+		if(err){
+			callback(err,data);
+			return;
+		}
+		try{
+			data.horarios = ponto.horarios;
+			data.comentario = ponto.comentario;
+			data.dataUltAtualizacao = new Date();
+			data.save(function(err,pontoNovo){
+				if(err){
+					callback(err);
+					return;
+				}
+				callback(err,pontoNovo);
+			});
+		}
+		catch(err)
+		{
+			callback(err,data);
+		}
+	});
 }
 
 module.exports.getById = function(id,callback)

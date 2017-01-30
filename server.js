@@ -11,7 +11,6 @@ var mongoose    = require('mongoose');
 var morgan      = require('morgan');
 var path        = require('path');
 var fs          = require('fs');
-var multiparty  = require('connect-multiparty');
 var jwt         = require('jsonwebtoken');
 var config      = require('./config');
 var cryptoUtil  = require('./util/cryptoUtil');
@@ -216,6 +215,12 @@ router.post('/pontos',function (req,res) {
   if(!ponto.hasOwnProperty('ano') || usuario_admin == false)
     ponto.ano = Number(momentInstance.format('YYYY'));
 
+  if(ponto.hasOwnProperty('comentario') == false)
+  {
+    res.json({ messagem:"[ERRO] Está faltando a propriedade 'comentario'." }).status(403);
+    return;
+  }
+
   // Segurança, não deixar o usuário atribuir as horas
   ponto.horasDia = 0;
   var horas = 0;
@@ -231,7 +236,11 @@ router.post('/pontos',function (req,res) {
   ponto.horasDia = horas;
 
   Ponto.add(ponto,function(err,ponto){
-    if(err) throw err;
+    if(err){
+      error(err);
+      res.json({sucesso:false, messagem:"O seu objeto não foi validado."}).status(403);
+      return;
+    }
     ponto.populate('feitoPor');
     res.json(ponto);
   });
@@ -240,36 +249,25 @@ router.post('/pontos',function (req,res) {
 router.put('/pontos',function(req, res){
   var usuario = req.decoded._doc;
   var newPonto = req.body;
-  Ponto.find(newPonto._id, function(err, oldPonto){
-    // callback que procura o ponto antigo
-    if(err){
-      // caso não exista
-      error(err);
-      res.json({message:"Esse valor não existe ou sistema inoperante"})
-        .status(404);
-    }
-    // caso o valor exista
-    else
+  Ponto.update(newPonto._id,newPonto,function(err,ponto){
+    if(err)
     {
-      newPonto.dataUltAtualizacao = Date();
-      Ponto.update(newPonto,function(err,data){
-        if(err)
-        {
-          error(err);
-          res.json({ message: "Algo deu errado"}).status(204);
-        }
-        res.json(data);
-      });
+      error(err);
+      res.json({ mensagem: "ERRO: Não existe o registro com id = "
+       + newPonto._id}).status(404);
+      return;
     }
+    res.json(ponto);
   });
 });
 
+// TODO: fazer teste
 router.put('/usuarios',function(req, res){
   var usuario = req.decoded._doc;
   var updateUsuario = req.body;
   Usuario.update(updateUsuario,function(err,usuario){
     if(err){
-      throw err;
+      error(err);
       res.json({ erro: 'Não foi possível fazer o update'}).status(404);
     }
     else{
