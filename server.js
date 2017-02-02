@@ -41,9 +41,17 @@ app.use(morgan('dev'));//ativando o log do servidor para vizualizar as requisiç
 
 app.use(function(req,res,next){
   res.header('Access-Control-Allow-Origin','*');
-  res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers','Content-Type');
-  next();
+  res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers','Content-Type,X-Access-Token');
+
+  if(req.method == 'OPTIONS')
+  {
+    res.send(200);
+  }
+  else {
+    next();
+  }
+
 })
 
 function log(message){
@@ -168,8 +176,9 @@ router.post('/registrar',function (req,res) {
 //****** SÓ PONHA ABAIXO DESSE MIDDLEWARE O QUE PRECISA DE AUTNETICAÇÃO PARA
 //******* SER FEITO
 router.use(function(req,res,next){
+
+
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-  debug("token = " + token);
   if(token)
   {
     jwt.verify(token,app.get('secret'),
