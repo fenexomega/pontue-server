@@ -39,17 +39,20 @@ module.exports.get = function(callback,limit)
   Ponto.find(callback).limit(limit);
 };
 
-module.exports.getByNumeroSemanaAndByAno = function(numeroSemana,ano, callback)
+module.exports.getByUsuarioAndNumeroSemanaAndByAno = function(usuario, numeroSemana, ano, callback)
 {
-	Ponto.find(query,callback)
-	.where('ano').gte(ano)
-	.where('numeroSemana').equals(numeroSemana);
+	var query = {ano: ano, numeroSemana: numeroSemana, feitoPor: usuario._id };
+	Ponto.find(query,callback);
 }
 
 module.exports.getByAno = function(ano, callback)
 {
-	Ponto.find({},callback)
-	.where('ano').equals(ano);
+	Ponto.find({ano: ano},callback);
+}
+
+module.exports.getByUsuarioAndAno = function(usuario, ano, callback)
+{
+	Ponto.find({ano: ano, feitoPor: usuario._id },callback);
 }
 
 module.exports.add = function(ponto,callback)

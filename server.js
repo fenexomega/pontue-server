@@ -203,6 +203,47 @@ router.use(function(req,res,next){
   }
 });
 
+// TODO: get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
+router.get('/pontos', function(req,res){
+  var usuario = req.decoded._doc;
+  var ano, semana;
+  if(req.query.hasOwnProperty('ano'))
+    ano = req.query.ano;
+  if(req.query.hasOwnProperty('semana'))
+    semana = req.query.semana;
+
+  if(semana == undefined)
+  {
+    console.log("Ano = " + ano);
+    if(ano == undefined)
+    {
+      error("Ano indefinido!")
+      res.send(403);
+    }
+    Ponto.getByUsuarioAndAno(usuario, ano, function(err,data)
+    {
+      if(err)
+      {
+        error(err);
+        res.status(500).json({messagem: "Erro"});
+      }
+      res.json(data);
+    });
+  }
+  else
+  {
+    Ponto.getByUsuarioAndNumeroSemanaAndByAno(usuario, semana, ano, function(err,data)
+     {
+      if(err)
+      {
+        error(err);
+        res.send(500);
+      }
+      res.json(data);
+    });
+  }
+});
+
 // Submeter ponto
 router.post('/pontos',function (req,res) {
   var ponto = req.body;
@@ -218,7 +259,7 @@ router.post('/pontos',function (req,res) {
   if(!ponto.hasOwnProperty('numeroDia') || usuario.admin == false)
     ponto.numeroDia = Number(momentInstance.format('d'));
   if(!ponto.hasOwnProperty('numeroMes') || usuario.admin == false)
-    ponto.numeroMes = Number(momentInstance.format('m'));
+    ponto.numeroMes = Number(momentInstance.format('M')) - 1;
   if(!ponto.hasOwnProperty('numeroSemana') || usuario.admin == false)
     ponto.numeroSemana = Number(momentInstance.format('w'));
   if(!ponto.hasOwnProperty('ano') || usuario_admin == false)
@@ -295,23 +336,6 @@ router.get('/usuario', function(req, res){
   res.json(usuario);
 });
 
-// TODO: GET pontos, para pegar os pontos da semana e do ano
-
-
-// //delete pokemon
-// //rota: /api/pokemons/_name (a,b,c...)
-// router.delete('/pokemons/:_name',function(req,res){
-//   var name = req.params._name;
-//   Pokemon.deletePokemon(name,function(err,pokemon){
-//     if(err){
-//       res.json("Algo de errado não está certo!");
-//     }
-//     res.json("Pokemon removed");
-//   });
-//   /*pokemons.splice(id,1);
-//   res.json('Pokemon removed');*/
-//   //console.log('[INFO]: Delete Pokemon with _name = '+name);
-// });
 
 //definindo a principal caminho (principal rota)
 app.use('/api',router);
