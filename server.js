@@ -6,6 +6,7 @@ var express     = require('express');//importo o express
 var app         = express();//criando o app do tipo express
 
 var http        = require('http');//importando o http
+var https       = require('https');
 var bodyParser  = require('body-parser');//importo o bodyParser
 var mongoose    = require('mongoose');
 var morgan      = require('morgan');
@@ -23,6 +24,10 @@ var port = process.env.PORT || 8080;
 mongoose.connect(config.database);
 var db = mongoose.connection;// pegando a conecção
 
+
+var privateKey = fs.readFileSync('certs/server.key','utf-8');
+var certificate = fs.readFileSync('certs/server.crt','utf-8');
+var credentials = {key: privateKey, cert: certificate};
 
 // MODELOS
 // ** tem de iniciar depois do mongoose e do autoincrement
@@ -206,42 +211,52 @@ router.use(function(req,res,next){
 // TODO: get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
 router.get('/pontos', function(req,res){
   var usuario = req.decoded._doc;
-  var ano, semana;
+  var ano, semana, dia;
   if(req.query.hasOwnProperty('ano'))
-    ano = req.query.ano;
+    ano     = req.query.ano;
   if(req.query.hasOwnProperty('semana'))
-    semana = req.query.semana;
+    semana  = req.query.semana;
+  if(req.query.hasOwnProperty('dia'))
+    dia     = req.query.dia;
 
-  if(semana == undefined)
-  {
-    console.log("Ano = " + ano);
     if(ano == undefined)
     {
       error("Ano indefinido!")
       res.send(403);
     }
-    Ponto.getByUsuarioAndAno(usuario, ano, function(err,data)
+
+    if(semana == undefined)
     {
-      if(err)
+      Ponto.getByUsuarioAndAno(usuario, ano, function(err,data){
+        if(err)
+        {
+          error(err);
+          res.status(500).json({messagem: "Erro"});
+        }
+        res.json(data);
+      });
+    }
+    else
+    {
+      if(dia == undefined)
       {
-        error(err);
-        res.status(500).json({messagem: "Erro"});
+        Ponto.getByUsuarioAndNumeroSemanaAndByAno(usuario, semana, ano,
+          function(err,data){
+            if(err)
+            {
+              error(err);
+              res.send(500);
+            }
+            res.json(data);
+          });
       }
-      res.json(data);
-    });
-  }
-  else
-  {
-    Ponto.getByUsuarioAndNumeroSemanaAndByAno(usuario, semana, ano, function(err,data)
-     {
-      if(err)
+      else
       {
-        error(err);
-        res.send(500);
+        // FIXME
+        Ponto.findOne()
       }
-      res.json(data);
-    });
-  }
+
+    }
 });
 
 // Submeter ponto
@@ -341,6 +356,7 @@ router.get('/usuario', function(req, res){
 app.use('/api',router);
 app.use(express.static('public'));
 
-var httpServer = http.createServer(app);
-httpServer.listen(port);
+// var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials,app);
+httpsServer.listen(port);
 console.log('[INFO]: Servidor rodando na porta ' + port);
