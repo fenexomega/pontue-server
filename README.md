@@ -16,7 +16,7 @@ Servidor REST para o backend do aplicativo de ponto PONTUE.
 2. Inicie o serviço do **MongoDB** e garanta que ele esteja pronto para receber conexões.
 3. Vá na pasta `certs/` e rode o script `generate_certs.sh`.
   * Garanta que foram gerados os arquivos `server.key` e `server.crt`.
-4. Instale as dependencias da aplicação com npm install.
+4. Instale as dependencias da aplicação com `npm install`.
 
 ## Como executar o Servidor
 
