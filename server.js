@@ -19,6 +19,7 @@ var moment      = require('moment')
 
 // Iniciando porta
 var port = process.env.PORT || 8080;
+var sslport = process.env.SSLPORT || 8443;
 
 // Database
 mongoose.connect(config.database);
@@ -358,5 +359,17 @@ app.use(express.static('public'));
 
 // var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials,app);
+// set up plain http server
+//
+// var httpApp = express()
+// // set up a route to redirect http to https
+// httpApp.get('*',function(req,res){
+//     res.redirect('https://localhost:8443'+req.url)
+// })
+//
+// var httpServer = https.createServer(httpApp);
+
+
+// httpServer.listen(port)
 httpsServer.listen(port);
 console.log('[INFO]: Servidor rodando na porta ' + port);
