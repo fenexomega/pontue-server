@@ -32,6 +32,8 @@ var pontoSchema = mongoose.Schema({
 	}
 });
 
+pontoSchema.index({feitoPor: 1, numeroSemana: 1, numeroDia: 1, ano: 1}, { unique: true });
+
 var Ponto = module.exports = mongoose.model('Ponto',pontoSchema);
 
 module.exports.get = function(callback,limit)
@@ -43,6 +45,16 @@ module.exports.getByUsuarioAndNumeroSemanaAndByAno = function(usuario, numeroSem
 {
 	var query = {ano: ano, numeroSemana: numeroSemana, feitoPor: usuario._id };
 	Ponto.find(query,callback);
+}
+
+module.exports.getByMesmoDiaDaData = function(date,callback)
+{
+	var mymoment =  moment(date);
+	var year 	= mymoment.weekYear();
+	var week 	= mymoment.week();
+	var day		=	mymoment.day();
+	var query	=	{ano: year, numeroSemana: week, numeroDia: day};
+	Ponto.findOne(query,callback);
 }
 
 module.exports.getByAno = function(ano, callback)

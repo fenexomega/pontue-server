@@ -222,8 +222,15 @@ router.get('/pontos', function(req,res){
 
     if(ano == undefined)
     {
-      error("Ano indefinido!")
-      res.send(403);
+      Ponto.getByMesmoDiaDaData(new Date(),function(err,data){
+        if(err){
+           error(err);
+           res.status(500).json({messagem: "error"});
+           return;
+        }
+        res.json(data);
+      });
+      return;
     }
 
     if(semana == undefined)
@@ -233,6 +240,7 @@ router.get('/pontos', function(req,res){
         {
           error(err);
           res.status(500).json({messagem: "Erro"});
+          return;
         }
         res.json(data);
       });
@@ -278,7 +286,7 @@ router.post('/pontos',function (req,res) {
     ponto.numeroMes = Number(momentInstance.format('M')) - 1;
   if(!ponto.hasOwnProperty('numeroSemana') || usuario.admin == false)
     ponto.numeroSemana = Number(momentInstance.format('w'));
-  if(!ponto.hasOwnProperty('ano') || usuario_admin == false)
+  if(!ponto.hasOwnProperty('ano') || usuario.admin == false)
     ponto.ano = Number(momentInstance.format('YYYY'));
 
   if(ponto.hasOwnProperty('comentario') == false)
@@ -304,7 +312,7 @@ router.post('/pontos',function (req,res) {
   Ponto.add(ponto,function(err,ponto){
     if(err){
       error(err);
-      res.json({sucesso:false, messagem:"O seu objeto não foi validado."}).status(403);
+      res.status(403).json({sucesso:false, messagem:"O seu objeto não foi validado."});
       return;
     }
     ponto.populate('feitoPor');
