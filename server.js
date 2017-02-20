@@ -337,24 +337,33 @@ router.put('/pontos',function(req, res){
 });
 
 // TODO: fazer teste
-router.put('/usuarios',function(req, res){
+router.put('/usuario',function(req, res){
   var usuario = req.decoded._doc;
   var updateUsuario = req.body;
-  Usuario.update(updateUsuario,function(err,usuario){
-    if(err){
-      error(err);
-      res.json({ erro: 'Não foi possível fazer o update'}).status(404);
+  console.log('id ' + updateUsuario._id);
+  Usuario.findById(updateUsuario._id, function(error, usuarioDB){
+    if(!error){
+      for(var key in updateUsuario){
+        usuarioDB[key] = updateUsuario[key];
+      }
+      usuarioDB.save(function(error, usuario){
+        if(!error){
+          res.json(usuario);  
+        }else{
+          res.json({"error":"Não foi possível atualizar"});
+        }
+      });
+    }else{
+      res.json({"error": "Usuário não encontrado por ID"});
     }
-    else{
-      res.json(usuario);
-    }
-  });
+  })
+
 
 });
 
 router.get('/usuario', function(req, res){
   var usuario = req.decoded._doc;
-  usuario = { email: usuario.email, nome: usuario.nome,
+  usuario = {_id: usuario._id, email: usuario.email, senha: usuario.senha, nome: usuario.nome,
      matricula: usuario.matricula };
 
   res.json(usuario);
