@@ -2,6 +2,7 @@ var express = require('express');
 var router  = express.Router();
 var Ponto = require('../../models/ponto');
 var moment = require('moment');
+var error  = require('../../util/helper').error;
 
 
 // TODO: get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
@@ -19,7 +20,8 @@ router.get('/pontos', function(req,res){
     {
       Ponto.getByMesmoDiaDaData(new Date(),function(err,data){
         if(err){
-          //  error(err);
+          error(err);
+
            res.status(500).json({messagem: "error"});
            return;
         }

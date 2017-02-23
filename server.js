@@ -64,17 +64,6 @@ app.use(function(req,res,next){
 
 })
 
-function log(message){
-  console.log("[INFO] " + message);
-}
-
-function debug(message){
-  console.log("[DEBUG] " + message);
-}
-
-function error(message){
-  console.error("[ERROR] " + message);
-}
 
 /********** SETUP INICIAL ***************
 *        CRIAR CONTA DE ADMIN
@@ -96,7 +85,6 @@ Usuario.getByEmail('admin',function(err,usuario){
     });
   }
 });
-
 
 
 //definindo a principal caminho (principal rota)
