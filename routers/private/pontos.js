@@ -4,8 +4,8 @@ var Ponto = require('../../models/ponto');
 var moment = require('moment');
 var error  = require('../../util/helper').error;
 
-
-// TODO: get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
+//  get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
+// BUG PEGAR PELO USUÁRIO
 router.get('/pontos', function(req,res){
   var usuario = req.decoded._doc;
   var ano, semana, dia;
@@ -92,20 +92,6 @@ router.post('/pontos',function (req,res) {
     return;
   }
 
-  // Segurança, não deixar o usuário atribuir as horas
-  ponto.horasDia = 0;
-  var horas = 0;
-  for(var chave in ponto.horarios)
-  {
-    // .hasOwnProperty() ??
-    for(var chaveTurno in ponto.horarios[chave])
-    {
-      if(ponto.horarios[chave][chaveTurno] == true)
-        horas += 2;
-    }
-  }
-  ponto.horasDia = horas;
-
   Ponto.add(ponto,function(err,ponto){
     if(err){
       // error(err);
@@ -120,6 +106,7 @@ router.post('/pontos',function (req,res) {
 router.put('/pontos',function(req, res){
   var usuario = req.decoded._doc;
   var newPonto = req.body;
+
   // FIXME falha de lógica. não checa se o usuário é o dono do ponto
   Ponto.update(newPonto._id,newPonto,function(err,ponto){
     if(err)

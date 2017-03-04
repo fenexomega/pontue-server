@@ -9,8 +9,6 @@ var config      = require('../../config');
 //****** SÓ PONHA ABAIXO DESSE MIDDLEWARE O QUE PRECISA DE AUTNETICAÇÃO PARA
 //******* SER FEITO
 var auth = function(req,res,next){
-
-
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
   if(token)
   {
@@ -19,7 +17,7 @@ var auth = function(req,res,next){
       if(err)
       {
         console.log(err);
-        res.json({error:"Token não autorizado"}).status(403);
+        res.status(403).json({error:"Token não autorizado"});
       }
       else
       {

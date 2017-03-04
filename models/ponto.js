@@ -83,6 +83,18 @@ module.exports.update = function(id,ponto,callback)
 			data.horarios = ponto.horarios;
 			data.comentario = ponto.comentario;
 			data.dataUltAtualizacao = new Date();
+			// Segurança, não deixar o usuário atribuir as horas
+			var horas = 0;
+			for(var chave in ponto.horarios)
+			{
+				// .hasOwnProperty() ??
+				for(var chaveTurno in ponto.horarios[chave])
+				{
+					if(ponto.horarios[chave][chaveTurno] == true)
+						horas += 2;
+				}
+			}
+			data.horasDia = horas;
 			data.save(function(err,pontoNovo){
 				if(err){
 					callback(err);

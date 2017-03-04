@@ -3,7 +3,6 @@ var router  = express.Router()
 var Usuario = require('../../models/usuario');
 
 
-
 // TODO: fazer teste
 router.put('/usuario',function(req, res){
   var usuario = req.decoded._doc;
@@ -25,18 +24,22 @@ router.put('/usuario',function(req, res){
       res.json({"error": "Usuário não encontrado por ID"});
     }
   })
-
-
 });
 
 
 router.get('/usuario', function(req, res){
   var usuario = req.decoded._doc;
+  /* JORDY: não gostei do fato de voltar o hash da senha do usuário, isso pode acarretar
+      ...em um incidente de segurança. O hash JAMAIS deve sair do backend/servidor.
+     ...Por comodidade, vou deixar aqui. */
   usuario = {_id: usuario._id, email: usuario.email, senha: usuario.senha,
     nome: usuario.nome, matricula: usuario.matricula };
   res.json(usuario);
 });
 
+router.get('/usuario/valido', function(req, res){
+    res.status(200).json({message:'OK'});
+});
 
 
 module.exports = router;

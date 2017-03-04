@@ -44,7 +44,8 @@ var json = req.body;
         else
         {
           var token = jwt.sign(usuario, config.secret,{
-            expiresIn: 60*60*24 // Expira em 24 horas
+            // expiresIn: 10 // Expira em 10 segundos. PARA DEV
+            expiresIn: 60*60*24*7 // Expira em 7 dias
           });
           res.json({
             success: true,
