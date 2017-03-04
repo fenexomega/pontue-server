@@ -5,7 +5,6 @@ var moment = require('moment');
 var error  = require('../../util/helper').error;
 
 //  get pontos por dia da semana (as ultimas segunda, terça, quarta,...)
-// BUG PEGAR PELO USUÁRIO
 router.get('/pontos', function(req,res){
   var usuario = req.decoded._doc;
   var ano, semana, dia;
@@ -18,7 +17,7 @@ router.get('/pontos', function(req,res){
 
     if(ano == undefined)
     {
-      Ponto.getByMesmoDiaDaData(new Date(),function(err,data){
+      Ponto.getByMesmoDiaDaData( usuario, new Date(), function(err,data){
         if(err){
           error(err);
 
