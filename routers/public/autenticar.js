@@ -30,29 +30,21 @@ var json = req.body;
         throw err;
       }
 
-      if(!usuario)
+      if(!usuario || text_password != usuario.senha)
       {
-        // FIXME, na resopsta tem de enviar o código 403: NOT AUTHORIZED
-        res.json({ code: 1, success: false});
+        res.status(403).json({ codigo: 1, mensagem: "PROBLEMA NO LOGIN"});
       }
       else
       {
-        if(text_password != usuario.senha)
-        {
-          res.json({ code: 2, success: false});
-        }
-        else
-        {
-          var token = jwt.sign(usuario, config.secret,{
-            // expiresIn: 10 // Expira em 10 segundos. PARA DEV
-            expiresIn: 60*60*24*7 // Expira em 7 dias
-          });
-          res.json({
-            success: true,
-            code: 0,
-            token: token
-          });
-        }
+        var token = jwt.sign(usuario, config.secret,{
+          // expiresIn: 10 // Expira em 10 segundos. PARA DEV
+          expiresIn: 60*60*24*7 // Expira em 7 dias
+        });
+        res.json({
+          success: true,
+          code: 0,
+          token: token
+        });
       }
   });
 });
