@@ -1,13 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-	<title>Teste</title>
+  <!-- Required meta tags always come first -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Language" content="pt-br">
+  <title>Pontue</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <base href="/">
 </head>
-<body>
-	<form action="/upload" method="post" enctype="multipart/form-data" >
-		<label>Teste de Arquivo</label>	
-		<input type="file" name="imagem">
-		<input type="submit" name="enviar">
-	</form>
+<body ng-app="mainApp">
+
+  <navbar></navbar>
+
+  <div ng-view>
+  </div>
+
+  <!-- jQuery first, then Bootstrap JS. -->
+  <script src="lib/jquery.js"></script>
+  <script src="lib/bootstrap.js"></script>
+  <script src="lib/angular.js" charset="utf-8"></script>
+  <script src="lib/angular-route.js" charset="utf-8"></script>
+  <script src="lib/ui-bootstrap-tpls.js" charset="utf-8"></script>
+
+  <!-- External libs -->
+
+  <!-- Sha256 -->
+  <script src="lib/sha256.js" charset="utf-8"></script>
+
+  <!-- Google Charts API -->
+  <script type="text/javascript" src="lib/ng-google-chart.js"></script>
+
+  <!-- momentjs -->
+  <script src="lib/moment.js" charset="utf-8"></script>
+  <script src="lib/angular-moment.js" charset="utf-8"></script>
+
+
+  <script src="js/main.js" charset="utf-8"></script>
+  <!-- Controllers -->
+  <script src="js/controllers/PontoController.js" charset="utf-8"></script>
+  <script src="js/controllers/LoginController.js" charset="utf-8"></script>
+  <script src="js/controllers/ContaController.js" charset="utf-8"></script>
+  <script src="js/controllers/RegistroController.js" charset="utf-8"></script>
+  <script src="js/controllers/NavbarController.js" charset="utf-8"></script>
+
+  <!-- Services -->
+  <script src="js/services/PontoService.js" charset="utf-8"></script>
+  <script src="js/services/LoginService.js" charset="utf-8"></script>
+  <script src="js/services/RegistroService.js" charset="utf-8"></script>
+  <script src="js/services/ContaService.js" charset="utf-8"></script>
+  <script src="js/services/AppToolkit.js" charset="utf-8"></script>
+
+  <!-- Directives -->
+  <script src="js/directives/NavbarDirective.js" charset="utf-8"></script>
+
+  <!-- Misc -->
+  <script src="js/constants/routes.js" charset="utf-8"></script>
+  <script src="js/constants/config.js" charset="utf-8"></script>
+  <script src="js/util/ChartFactory.js" charset="utf-8"></script>
 </body>
+
 </html>

@@ -90,6 +90,9 @@ Usuario.getByEmail('admin',function(err,usuario){
 //definindo a principal caminho (principal rota)
 app.use('/api', routers);
 app.use(express.static('public'));
+app.get('*', function(req, res) {
+    res.redirect('/');
+});
 
 // var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials,app);
